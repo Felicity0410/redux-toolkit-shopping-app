@@ -5,7 +5,7 @@ import Notification from './components/UI/Notification/Notification';
 import { v4 as uuid } from 'uuid'
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { toggleNotification } from './store';
+import { betterSaveCartData, fetchCartData} from './store/thunk-actions';
 
 const products = [
   {
@@ -37,39 +37,16 @@ function App() {
   const dispatch = useDispatch()
 
   useEffect(() => {
+    dispatch(fetchCartData())
+  }, [dispatch])
+
+  useEffect(() => {
     if(isInitialLoading) {
       isInitialLoading = false
       return
     }
-    dispatch(toggleNotification({
-      status: 'success',
-      title: 'Saving ...',
-      message: 'Saving your cart data'
-    }))
-    fetch('https://shopping-app-fef0a-default-rtdb.asia-southeast1.firebasedatabase.app/cart.json', {
-      method: 'PUT',
-      body: JSON.stringify(cart)
-    })
-    .then(response => {
-      if(!response.ok) {
-        throw new Error()
-      }
-      return response.json()
-    })
-    .then(data => {
-      dispatch(toggleNotification({
-        status: 'success',
-        title: 'Saved...',
-        message: 'Cart data is saved.'
-      }))
-    })
-    .catch(error => {
-      dispatch(toggleNotification({
-        status: 'error',
-        title: 'Something went wrong ...',
-        message: 'Cart saving was failed'
-      }))
-    })
+    
+    dispatch(betterSaveCartData(cart))
    
   }, [cart, dispatch])
 
